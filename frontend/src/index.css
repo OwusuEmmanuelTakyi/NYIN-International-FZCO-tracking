@@ -84,3 +84,33 @@ select option {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.5; }
 }
+
+/* Add these animations to the bottom of your src/index.css */
+
+@keyframes slideLoader {
+  0%   { transform: translateX(-100%); }
+  50%  { transform: translateX(300%); }
+  100% { transform: translateX(300%); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0);    opacity: 1;   }
+  50%       { transform: translateY(-6px); opacity: 0.5; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+/* Skeleton shimmer effect */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--border) 25%,
+    var(--muted)  50%,
+    var(--border) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
