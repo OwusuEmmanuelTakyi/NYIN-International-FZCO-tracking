@@ -8,11 +8,31 @@ export function useInvoices() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('invoices')
-        .select('*, profiles:client_id(full_name, company_name), orders:order_id(order_number)')
+        .select(`
+          *,
+          profiles:client_id (
+            id,
+            full_name,
+            company_name,
+            email,
+            phone
+          ),
+          orders:order_id (
+            id,
+            order_number,
+            order_type,
+            commodity,
+            total_value,
+            currency
+          )
+        `)
+        .eq('is_deleted', false)
         .order('created_at', { ascending: false })
       if (error) throw error
       return data ?? []
-    }
+    },
+    staleTime: 0,           // always refetch when tab focused
+    refetchOnMount: true,   // refetch every time component mounts
   })
 }
 
@@ -22,13 +42,34 @@ export function useInvoice(id) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('invoices')
-        .select('*, profiles:client_id(*), orders:order_id(*)')
+        .select(`
+          *,
+          profiles:client_id (
+            id,
+            full_name,
+            company_name,
+            email,
+            phone
+          ),
+          orders:order_id (
+            id,
+            order_number,
+            order_type,
+            commodity,
+            total_value,
+            currency,
+            quantity,
+            unit
+          )
+        `)
         .eq('id', id)
         .single()
       if (error) throw error
       return data
     },
-    enabled: !!id
+    enabled: !!id,
+    staleTime: 0,
+    refetchOnMount: true,
   })
 }
 
@@ -39,7 +80,19 @@ export function useCreateInvoice() {
       const { data, error } = await supabase
         .from('invoices')
         .insert([invoiceData])
-        .select()
+        .select(`
+          *,
+          profiles:client_id (
+            id,
+            full_name,
+            company_name,
+            email
+          ),
+          orders:order_id (
+            id,
+            order_number
+          )
+        `)
         .single()
       if (error) throw error
       return data
@@ -60,7 +113,19 @@ export function useUpdateInvoice() {
         .from('invoices')
         .update({ ...updates, updated_at: new Date().toISOString() })
         .eq('id', id)
-        .select()
+        .select(`
+          *,
+          profiles:client_id (
+            id,
+            full_name,
+            company_name,
+            email
+          ),
+          orders:order_id (
+            id,
+            order_number
+          )
+        `)
         .single()
       if (error) throw error
       return data
